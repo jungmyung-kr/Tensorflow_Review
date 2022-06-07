@@ -73,7 +73,15 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
-women = pd.read_csv('C:/ITWILL/5_Tensorflow/data/women.csv')
+import numpy as np 
+import random as rd 
+
+## weight seed 적용 
+tf.random.set_seed(123) # global seed 
+np.random.seed(123) # numpy seed
+rd.seed(123) # random seed 
+
+women = pd.read_csv('C:/ITWILL/6_Tensorflow/data/women.csv')
 print(women.info())
 print(women)
 
@@ -88,15 +96,13 @@ print(y_data.max()) # 164
 # 2. 정규화(0~1)
 X = x_data / 72
 Y = y_data / 164
-X.dtype # dtype('float64')
-Y.dtype # dtype('float64')
 
 X = tf.constant(X, dtype=tf.float32)
 Y = tf.constant(Y, dtype=tf.float32)
 
 # 3. w,b변수 정의 - 난수 이용 
-w = tf.Variable(tf.random.uniform([1], 0.1, 1.0))
-b = tf.Variable(tf.random.uniform([1], 0.1, 1.0))
+w = tf.Variable(tf.random.uniform([1], 0.1, 1.0)) # 가중치 
+b = tf.Variable(tf.random.uniform([1], 0.1, 1.0)) # 편향 
 print(w) # float32
 
 # 4. 회귀모델 
@@ -112,19 +118,31 @@ def loss_fn() : #  인수 없음
     return loss
 
 # 6. model 최적화 객체 : 오차의 최소점을 찾는 객체  
+optimizer = tf.optimizers.Adam(lr = 0.5)
 
 
 # 7. 반복학습 : 200회 
+for step in range(200) : 
+    # 오차제곱평균 최적화 : 손실값 최소화 -> [w, b] 갱신(update)
+    optimizer.minimize(loss_fn, var_list=[w, b]) # (손실값, 수정 대상)
+    
+    print("step =", (step+1), ", loss =", loss_fn().numpy())    
+    print("w = {}, b = {}".format(w.numpy(), b.numpy()))
 
 
 # 8. 최적화된 model 검증
-
 # 1) MSE 평가 
-
+y_pred = linear_model(X) # update [a,b] -> 예측치  
+print("="*35)
+mse = mean_squared_error(Y, y_pred)    
+print('mse =', mse) # mse = 0.0003666062  
 
 # 2) 회귀선    
-
-
+plt.plot(X, Y, 'bo')
+plt.plot(X, y_pred, 'r-')
+plt.show()    
+    
+    
 ###############################################################################
 
 
