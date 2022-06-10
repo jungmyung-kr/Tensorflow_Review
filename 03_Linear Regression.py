@@ -194,16 +194,58 @@ x_train, x_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=123)
 
 # 3. w, b변수 정의 : tf.random.normal() 함수 이용 
+tf.random.set_seed(123) # w,b 난수 seed값 지정 
+w = tf.Variable(tf.random.normal(shape=[13, 1], dtype=tf.float64)) 
+b = tf.Variable(tf.random.normal(shape=[1], dtype=tf.float64)) 
 
 # 4. 회귀모델 : 행렬곱 
+def linear_model(X) : # X:입력 -> y 예측치 : 출력 
+    y_pred = tf.linalg.matmul(X, w) + b 
+    return y_pred 
 
 # 5. 비용 함수 정의 : 예측치 > 오차 > 손실함수 
+def loss_fn() : # 인수 없음 
+    y_pred = linear_model(x_train) # y 예측치
+    err = tf.math.subtract(y_train, y_pred) # y - y_pred : 오차
+    loss = tf.reduce_mean(tf.square(err)) # MSE 
+    return loss 
 
 # 6. 최적화 객체 
+opt = tf.optimizers.Adam(learning_rate=0.05) 
 
 # 7. 반복학습 
+loss_value = [] # step 단위 손실 저장 
+
+for step in range(1000) : 
+    opt.minimize(loss=loss_fn, var_list=[w, b]) 
+    
+    # 100배수 단위 출력 
+    if (step+1) % 100 == 0 :
+        print('step =', (step+1), ', loss value =', loss_fn().numpy())
+        
+    # step 단위 손실 저장 
+    loss_value.append(loss_fn().numpy())
+    
+'''
+step = 100 , loss value = 0.061076966695681335
+step = 200 , loss value = 0.047216594487916784
+step = 300 , loss value = 0.04417740562003431
+step = 400 , loss value = 0.043181183253139015
+step = 500 , loss value = 0.04272790600851459
+step = 600 , loss value = 0.042513057948725036
+step = 700 , loss value = 0.04241907786899326
+step = 800 , loss value = 0.04238223433514054
+step = 900 , loss value = 0.042369372792486544
+step = 1000 , loss value = 0.04236538247439902
+'''
 
 # 8. 최적화된 model 평가
+y_pred = linear_model(x_test)
+
+mse = mean_squared_error(y_test, y_pred)
+print('='*40)
+print('MSE =', mse)
+# MSE = 0.040174189187297565
 
 
 ###############################################################################
