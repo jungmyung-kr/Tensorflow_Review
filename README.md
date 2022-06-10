@@ -12,3 +12,4 @@ Tensorflow 주제별 문제 풀이를 통한 복습
 6. CNN Model
 7. Selenium Image Crawling
 8. Face Detection
+9. TextVectorizatin Classifier
