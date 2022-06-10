@@ -297,18 +297,55 @@ print(model) # object info
 
 
 # 4. DNN model layer 구축 
+# hidden layer1 
+model.add(Dense(units=64, input_shape=(13,), activation='relu')) # 1층 
 
+# hidden layer2
+model.add(Dense(units=32, activation='relu')) # 2층
+
+# hidden layer3
+model.add(Dense(units=16, activation='relu')) # 3층
+
+# output layer 
+model.add(Dense(units=1)) # 4층 
+
+# model layer 확인 
+print(model.summary())
+'''
+dense (Dense)              (None, 64)                704       
+_________________________________________________________________
+dense_1 (Dense)             (None, 32)                2080      
+_________________________________________________________________
+dense_2 (Dense)             (None, 16)                528       
+_________________________________________________________________
+dense_3 (Dense)             (None, 1)                 17        
+'''
 
 # 5. model compile : 학습과정 설정(다항 분류기)
-
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
 
 # 6. model training 
-
+model.fit(x=x_train, y=y_train, # 훈련셋 
+          epochs=50, # 학습횟수
+          verbose=1,  # 출력여부 
+          validation_data=(x_val, y_val)) # 검증셋
+'''
+Epoch 50/50
+12/12 [==============================] - 0s 4ms/step - loss: 0.0041 - mae: 0.0446 - val_loss: 0.0084 - val_mae: 0.0590
+'''
 
 
 # 7. model evaluation : test dataset
 
+loss_val, mae = model.evaluate(x_val, y_val)
+print('loss value =', loss_val)
+print('mae =', mae)
+'''
+5/5 [==============================] - 0s 3ms/step - loss: 0.0084 - mae: 0.0590
+loss value = 0.008379421196877956
+mae = 0.05902756378054619
+'''
 
 
     
