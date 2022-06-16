@@ -204,41 +204,71 @@ obj = OneHotEncoder()
 y_data = obj.fit_transform(y_arr.reshape([-1, 1])).toarray()
 
 
-# 1. X,Y변수 정의 : 공급형 변수 
+# 1. X, y변수 전처리 
+
+# x_data 정규화 
+x_data = minmax_scale(X)
+
+
+# y변수 : one-hot encoding 
+y_arr = np.array(y) # numpy 변환 
+obj = OneHotEncoder()
+y_data = obj.fit_transform(y_arr.reshape([-1, 1])).toarray()
+
+
+# 2. X,Y변수 정의 : 공급형 변수 
 X = tf.constant(x_data, tf.float32) 
 y = tf.constant(y_data, tf.float32)
 
-# 2. w,b 변수 정의 
+# 3. w,b 변수 정의 
 tf.random.set_seed(123)
-w = None # [입력수, 출력수]
-b = None # [출력수]
+w = tf.Variable(tf.random.normal([2, 3])) # [입력수, 출력수]
+b = tf.Variable(tf.zeros([3])) # [출력수]
 
-# 3. 회귀방정식 
+# 4. 회귀방정식 
 def linear_model(X) : # train, test
-    y_pred = tf.matmul(X, w) + b  
+    y_pred = tf.matmul(X, w) + b  # 행렬곱 : [None,3]*[3,1]=[None,1]
     return y_pred
 
-# 4. softmax 활성함수 적용 
+# 5. softmax 활성함수 적용 
 def soft_fn(X):
     y_pred = linear_model(X)
     soft = tf.nn.softmax(y_pred)
     return soft
 
-# 5. 손실 함수 정의  
+# 6. 손실 함수 정의 : 손실계산식 수정 
 def loss_fn() : #  인수 없음 
-    soft = soft_fn(X) 
+    soft = soft_fn(X) # 훈련셋 -> 예측치 : 회귀방정식  
     loss = -tf.reduce_mean(y*tf.math.log(soft)+(1-y)*tf.math.log(1-soft))
     return loss
 
+# 7. 최적화 객체 
+optimizer = tf.optimizers.Adam(lr=0.005) 
 
-# 6. 최적화 객체 
+# 8. 반복학습 
+for step in range(5000) : 
+    # 오차제곱평균 최적화 : 손실값 최소화 -> [a, b] 갱신(update)
+    optimizer.minimize(loss_fn, var_list=[w, b]) #(손실값, 수정 대상)
+    
+    # 500배수 단위 출력 
+    if (step+1) % 500 == 0 :
+        print("step =", (step+1), ", loss =", loss_fn().numpy())   
 
 
-# 7. 반복학습 
+# 9. 최적화된 model 검정 
+soft_re = soft_fn(X).numpy()
 
+y_pred = tf.argmax(soft_re, axis=1) # 열축 기준 
+y_true = tf.argmax(y, axis=1) #  # 열축 기준 
 
-# 8. 최적화된 model 검정 
+acc = accuracy_score(y_true, y_pred)
+print("="*40)
+print('accuracy =', acc) # accuracy = 0.98
 
+# y_true vs y_pred  
+print("="*40) 
+print('y_pred : ', y_pred.numpy()[:15])
+print('y_true : ', y_true.numpy()[:15])
 
 ###############################################################################
 
