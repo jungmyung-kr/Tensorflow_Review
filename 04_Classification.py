@@ -366,9 +366,42 @@ optimizer = tf.optimizers.Adam(lr=0.01)
 
 
 # 9. 반복학습 
-
+loss_val = []
+for step in range(2000) : 
+    # 오차제곱평균 최적화 : 손실값 최소화 -> [a, b] 갱신(update)
+    optimizer.minimize(loss_fn, var_list=[w, b]) #(손실값, 수정 대상)
     
-# 10. 최적화된 model 검증 
+    # 100배수 단위 출력 
+    if (step+1) % 200 == 0 :
+        print("step =", (step+1), ", loss =", loss_fn().numpy())
+    loss_val.append(loss_fn().numpy())    
+    
+    
+# 10. 적적화된 model 검증 
+soft_re = soft_fn(x_test).numpy()
 
+y_pred = tf.argmax(soft_re, 1) # demension : 2d
+y_true = tf.argmax(y_test, 1) # demension : 2d
+
+acc = accuracy_score(y_true, y_pred)
+print('accuracy =', acc) # accuracy = 0.98
+
+'''
+step = 200 , loss = 0.06003735238669643
+step = 400 , loss = 0.02922042555340125
+step = 600 , loss = 0.01916724251850193
+step = 800 , loss = 0.01418028865527556
+step = 1000 , loss = 0.011102086315873883
+step = 1200 , loss = 0.008942419709185086
+step = 1400 , loss = 0.007311927138572721
+step = 1600 , loss = 0.006023632246639046
+step = 1800 , loss = 0.004981346240771604
+step = 2000 , loss = 0.004163072611802871
+========================================
+accuracy = 0.9648148148148148
+'''
 
 # 11. loss value vs epochs 시각화 
+import matplotlib.pyplot as plt
+plt.plot(loss_val, 'r--')
+plt.show()
