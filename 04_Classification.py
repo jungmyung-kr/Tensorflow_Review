@@ -377,7 +377,7 @@ for step in range(2000) :
     loss_val.append(loss_fn().numpy())    
     
     
-# 10. 적적화된 model 검증 
+# 10. 최적화된 model 검증 
 soft_re = soft_fn(x_test).numpy()
 
 y_pred = tf.argmax(soft_re, 1) # demension : 2d
