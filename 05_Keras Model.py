@@ -145,17 +145,36 @@ model = Sequential()
 
 # 4. DNN model layer 구축 
 
+# hidden layer1 : [64, 32]
+model.add(Dense(32, input_shape = (64,), activation = 'relu'))  # 1층 
+
+# hidden layer2 : [32, 16] 
+model.add(Dense(16, activation = 'relu')) # 2층 
+
+# output layer : [16, 10]
+model.add(Dense(10, activation = 'softmax')) # 3층 
+
 
 # 5. model compile : 학습과정 설정(다항 분류기)
+model.compile(optimizer = 'adam',
+              loss = 'categorical_crossentropy', 
+              metrics = ['accuracy'])
 
 
-# 6. model training : training dataset
+# 6. model training 
+model.fit(x_train, y_train,
+          epochs = 100, # 학습횟수 
+          verbose=1, # 출력여부 
+          validation_data=(x_val, y_val)) # 검증data
 
-
-# 7. model evaluation : validation dataset
-
+# 7. model evaluation : test dataset
+print('model evaluation')
+model.evaluate(x_val, y_val)
 
 # 8. model save : file save - HDF5 파일 형식 
+model.save('keras_model_digits.h5')
+print('model saved')
+
 
 
 ###############################################################################
