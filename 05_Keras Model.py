@@ -228,18 +228,82 @@ val_lab.shape # (10000, 10)
 
 # 3. keras model
 model = Sequential() 
+print(model) # object info
 
 
+# 4. DNN model layer 구축 : hidden layer(3) -> output layer
 
-# 4. DNN model layer 구축 
+# [수정] 2차원 image
+input_shape = (28, 28) 
+
+# [추가] Flatten layer :2d(28, 28) -> 1d(784)
+model.add(Flatten(input_shape = input_shape)) 
+
+# hidden layer1 : [784, 128]  
+model.add(Dense(128, input_shape=(784,), activation='relu')) # 1층 
+model.add(Dropout(rate = 0.3)) # [추가]
+
+# hidden layer2 : [128, 64]
+model.add(Dense(64, activation = 'relu'))  # 2층
+model.add(Dropout(rate = 0.1)) # [추가]
+
+# hidden layer3 : [64, 32] 
+model.add(Dense(32, activation = 'relu')) # 3층 
+model.add(Dropout(rate = 0.1)) # [추가]
+
+# hidden layer4 : [32, 16] 
+model.add(Dense(16, activation = 'relu')) # 4층 
+
+# output layer : [16, 10]
+model.add(Dense(10, activation = 'softmax')) # 5층 
 
 
-
-# 5. model training 
-
-
-
-# 6. model evaluation : validation dataset
+# 5. model compile : 학습과정 설정(다항 분류기)
+model.compile(optimizer = 'adam',
+              loss = 'categorical_crossentropy', # one hot encoding
+              metrics = ['accuracy'])
 
 
+# 6. model training : train(10) -> test(1)
+callback = EarlyStopping(monitor='val_loss', patience=5)
+# epoch=5 이후 검증 손실이 개선되지 않으면 조기종료 
+
+model_fit = model.fit(train_img, train_lab,
+          epochs = 30, # [수정] 학습횟수 : 60000 * 30
+          batch_size = 32, # 32 images
+          verbose=1,
+          validation_data=(val_img, val_lab),# [추가]
+          callbacks = [callback]) # [추가] 
+
+
+# 7. model evaluation : test dataset
+print('model evaluation')
+model.evaluate(val_img, val_lab)
+# - - 1s 133us/sample - loss: 0.2734 - accuracy: 0.8791- 1s 133us/sample - loss: 0.2734 - accuracy: 0.8791
+
+
+#[내용 추가]
+# 1. history : train vs val -> overfitting 시작점 확인 
+# 2. dropout : hidden layer에 dropout 적용 
+# 3. earlyStopping : 최적의 epochs 찾기 
+
+# 8. model history 
+import matplotlib.pyplot as plt 
+
+# loss vs val_loss : overfitting 시작점 : epoch 2
+plt.plot(model_fit.history['loss'], 'y', label='train loss')
+plt.plot(model_fit.history['val_loss'], 'r', label='val loss')
+plt.xlabel('epochs')
+plt.ylabel('loss value')
+plt.legend(loc='best')
+plt.show()
+
+
+# accuracy vs val_accuracy : : overfitting 시작점 : epoch 2
+plt.plot(model_fit.history['accuracy'], 'y', label='train acc')
+plt.plot(model_fit.history['val_accuracy'], 'r', label='val acc')
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.legend(loc='best')
+plt.show
 
