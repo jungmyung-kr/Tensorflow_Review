@@ -36,6 +36,38 @@ img = x_train[6]
 plt.imshow(img, cmap='gray') # 숫자 5 -> x-ray 방식 
 plt.show()
 
+# input image
+img = img.reshape(-1, 28,28,1) 
+
+# Filter
+Filter = tf.Variable(tf.random.normal([3,3,1,10], stddev=0.01))
+
+# 합성곱  
+conv2d = tf.nn.conv2d(img, Filter, strides=[1,2,2,1], padding='SAME')
+print(conv2d)
+# Tensor("Conv2D:0", shape=(1, 14, 14, 10), dtype=float32)
+
+conv2d_img = np.swapaxes(conv2d, 0, 3)
+for i, one_img in enumerate(conv2d_img) : 
+    # 1행5열 : 5개 이미지 
+    plt.subplot(1,10,i+1)
+    plt.imshow(one_img.reshape(14,14), cmap='gray')    
+plt.show()    
+
+# Max Pooling
+pool = tf.nn.max_pool(conv2d, ksize=[1,3,3,1], strides=[1,2,2,1], 
+                      padding='SAME')
+print(pool)
+#Tensor("MaxPool:0", shape=(1, 7, 7, 10), dtype=float32)
+
+pool_img = np.swapaxes(pool, 0, 3)
+
+for i, one_img in enumerate(pool_img) :
+    # 1행5열 : 5개 이미지 
+    plt.subplot(1,10, i+1)
+    plt.imshow(one_img.reshape(7,7), cmap='gray')
+plt.show()
+
 
 ###############################################################################
 
