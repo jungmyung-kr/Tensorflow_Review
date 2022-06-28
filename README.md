@@ -13,3 +13,5 @@ Tensorflow 주제별 문제 풀이를 통한 복습
 7. Selenium Image Crawling
 8. Face Detection
 9. TextVectorizatin Classifier
+10. RNN Model
+11. ImageNet Transfer Learning
