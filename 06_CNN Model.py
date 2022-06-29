@@ -91,7 +91,50 @@ from matplotlib.image import imread
 img = imread('C:/ITWILL/6_Tensorflow/data/images/volcano.jpg') # 이미지 읽어오기
 plt.imshow(img)
 plt.show()
-print(img.shape)
+print(img.shape)  # (405, 720, 3) (512, 768, 3) - 1차원
+
+# input image(X) : [size, h, w, color] 
+Img = img.reshape(-1, 405, 720, 3) # 전체,세로,가로,색상 
+print(type(Img))
+print(Img)
+
+# TypeError 해결방법 
+Img = Img.astype('float32')
+print(Img)
+'''
+TypeError: Value passed to parameter 'input' has DataType uint8 not in list of allowed values: float16, bfloat16, float32, float64
+'''
+
+# Filter(weight) 변수 정의 : [h, w, color, featuremap]
+Filter = tf.Variable(tf.random.normal([6, 6, 3, 16]))
+
+# Convolution layer 
+conv2d = tf.nn.conv2d(Img, Filter, strides=[1,1,1,1], padding='SAME')
+print(conv2d)
+# Tensor("Conv2D_10:0", shape=(1, 405, 720, 16), dtype=float32)
+
+# Max Pooling layer
+pool = tf.nn.max_pool(conv2d, ksize=[1,3,3,1], strides=[1,2,2,1], 
+                      padding='SAME')
+print(pool)
+#Tensor("MaxPool_2:0", shape=(1, 203, 360, 16), dtype=float32)
+
+    
+# 합성곱 연산 
+conv2d_img = np.swapaxes(conv2d, 0, 3)
+
+for i, one_img in enumerate(conv2d_img) : 
+    plt.subplot(1,16,i+1)
+    plt.imshow(one_img.reshape(405, 720))    
+plt.show()    
+
+# 폴링 연산
+pool_img = np.swapaxes(pool, 0, 3)
+
+for i, one_img in enumerate(pool_img) :
+    plt.subplot(1,16, i+1)
+    plt.imshow(one_img.reshape(203, 360))
+plt.show()
 
 
 ###############################################################################
