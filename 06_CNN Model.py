@@ -205,14 +205,45 @@ y_val = to_categorical(y_val)
 # model 생성 
 model = Sequential()
 
+input_shape = (28, 28, 1)
+
 # 1. CNN Model layer
 
-# 2. model.compile
+# Convolution1 : [5,5,1,64]
+model.add(Conv2D(64, kernel_size=(5,5), padding='same',
+                 input_shape = input_shape))
+model.add(Activation('relu'))
+model.add(MaxPool2D(pool_size=(2,2), strides=(2,2), padding='same'))
 
-# 3. model training
+# Convolution2 : [5,5,64,128]
+model.add(Conv2D(128, kernel_size=(5,5), padding='same'))
+model.add(Activation('relu'))
+model.add(MaxPool2D(pool_size=(2,2), strides=(2,2), padding='same'))
+
+# Flatten layer : 3d -> 1d
+model.add(Flatten()) 
+
+# Affine layer(Fully connected + relu) : [n, 256]
+model.add(Dense(256, activation = 'relu'))
+
+# Output layer(Fully connected + softmax) : [256, 10]
+model.add(Dense(10, activation = 'softmax'))
+
+# 2. model compile
+model.compile(optimizer = 'adam',
+              loss = 'categorical_crossentropy', # one hot encoding
+              metrics = ['accuracy'])
+
+# 3. model train
+model_fit = model.fit(x=x_train, y=y_train, 
+                      epochs=3,
+                      batch_size=100, 
+                      verbose=1)
 
 # 4. model evaluation
-
-
+model.evaluate(x=x_val, y=y_val)
+'''
+- 4s 387us/sample - loss: 0.0116 - accuracy: 0.9925
+'''
 
 
